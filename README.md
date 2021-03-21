@@ -41,3 +41,14 @@ I'm fairly new to Python, so feel free to judge my code.
 This is an incomplete, and by definition, "non-conforming implementation" of ECMAScript.
 
 You would be hard pressed to find anything that _completely_ conforms, but that's the goal of this project.
+
+### Another note
+
+The spec also has a [section on hosts and implementations.](https://tc39.es/ecma262/#sec-hosts-and-implementations)  
+
+Special notes:
+
+- Implementations can define host-defined facilities
+- "A [host](https://tc39.es/ecma262/#host) is often an external specification" - Spec
+- A host further defines things, but doesn't necessarily do anything.
+- See <https://es.discourse.group/t/hosts-and-implementations/706>
