@@ -1,0 +1,3 @@
+
+class SubclassError (ValueError):
+   pass

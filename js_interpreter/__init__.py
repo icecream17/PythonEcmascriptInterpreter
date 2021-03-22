@@ -2,16 +2,25 @@
 An implementation of JS in python, for educational purposes
 """
 
+# This file doesn't implement much of the spec, it's split up.
+# Sections (Introduction) to (4.3 ECMAScript Overview) don't need any code.
+
+# (4.4 Terms and Definitions) will soon hopefully be supported by (Terms.py)
+
+
 import asyncio
-import typing
 import inspect # Only used in isThingClassOrDescriptorClass
 
+import typing
+from typing import Union, List
 
 # Importing ...itself?
 import js_interpreter
+from js_interpreter.errors import SubclassError
+from js_interpreter.TypesAndValues import Type
 
 
-CURRENT_IMPLEMENTATION_PROGRESS: typing.Final = '4.4.4: type'
+CURRENT_IMPLEMENTATION_PROGRESS: typing.Final = '4.4.3: host-defined'
 """This implementation supports clauses 0 thru CURRENT_IMPLEMENTATION_PROGRESS, inclusive"""
 
 
@@ -28,9 +37,8 @@ Here, this is only for describing the js_interpreter itself.
 For example, the js_interpreter is described by Descriptor("unfinished non-conforming implementation")
 """
 
-defined_at = None
+defined_at: typing.Final = None
 """defined_at will always be None"""
-
 
 class Thing:
    """Creates a... thing"""
@@ -40,12 +48,16 @@ class Thing:
 
    def __init__(self, name=None, definedAt=None):
       self.described_by = []
-      self.defined_at = None
+      self.defined_at: Union[None, DefinitionLocation, List[DefinitionLocation]] = None
 
       if name is not None:
          self.name = name
       if definedAt is not None:
-         self.setDefinitionLocation(definedAt)
+         self.addDefinitionLocation(definedAt)
+
+      if issubclass(self.__class__, Type):
+         self.type = self.__class__
+         self.has = {}
 
    def addDescriptor(self, descriptorName: str):
       try:
@@ -71,8 +83,12 @@ class Thing:
          
       return False
 
-   def setDefinitionLocation(self, location):
-      describeDefinitionLocation(self, location) # See global function below
+   def addDefinitionLocation(self, location, loose=False):
+      """
+      Marks where something is defined in the specification.
+      """
+      locationDescriptor = getDefinitionLocationAndCreateIfUndefined(location)
+      locationDescriptor.describe(self, loose=loose)
 
 
 class Descriptor (Thing):
@@ -86,15 +102,22 @@ class Descriptor (Thing):
    described_by = []
    defined_at = None
 
-   def __init__(self, name: str, parents=[], synonyms=[], __doc__=None):
+   # Where isFinite is a boolean for whether the set of things it describes is Finite
+   def __init__(self, name: str, parents=None, synonyms=None, isFinite=False, __doc__=None):
       global descriptors
       if name in descriptors:
          raise ValueError('Descriptor with this name already exists')
+
+      if parents is None:
+         parents = []
+      if synonyms is None:
+         synonyms = []
 
       try:
          self._parents = [descriptors[parent_name] for parent_name in parents]
       except KeyError as error:
          raise KeyError("Has parents that don't exist") from error
+
 
       self._is_also = []
       for synonym in synonyms:
@@ -110,9 +133,15 @@ class Descriptor (Thing):
          if self not in equivalent._is_also:
             equivalent._is_also.append(self)
       
+
       self.__doc__ = 'Descriptor: ' + name
       if __doc__ is not None:
          self.__doc__ += '\n\n' + __doc__
+
+
+      if isFinite:
+         self.values = []
+
 
       super().__init__(name=name)
       descriptors[name] = self
@@ -146,12 +175,30 @@ class Descriptor (Thing):
             "Oh well. <value.described_by.append(self) failed>"
          ) from error
 
+      if hasattr(self, 'values'):
+         self.values.append(value)
 
-class DescriptorClass (type, Descriptor):
+   def describes(self, value):
+      """Checks if self describes a value"""
+      if self in value.described_by:
+         return True
+      else:
+         try:
+            return self._describes(value)
+         except AttributeError:
+            try:
+               return value in self.values
+            except AttributeError:
+               return False
+
+
+class ThingClass (type, Descriptor):
    """
-   | This is a metaclass for adjective classes.
+   | A metaclass for Thing classes.
    |
-   | If you just want to create an adjective use <js_interpreter.Descriptor> instead
+   | If you want to create another metaclass, just subclass this.
+   | If you want to create a Thing class, metaclass this.
+   | If you just want to create a Thing use <js_interpreter.Thing> instead
    """
 
    described_by = []
@@ -159,22 +206,46 @@ class DescriptorClass (type, Descriptor):
 
    def __init__(self, _name, _bases, _dict):
       if not issubclass(self, Thing):
-         raise ValueError("Your new class has to be a subclass of Descriptor {if metaclass=DescriptorClass}")
+         raise SubclassError("Your new class has to be a subclass of Thing {if metaclass=ThingClass}")
       self.described_by = []
       self.defined_at = None
+      self.name = self.__name__
+      self.addDefinitionLocation = ThingClass.addDefinitionLocation
+
+   @classmethod
+   def addDefinitionLocation(cls, location, loose=False):
+      """Marks where something is defined in the specification."""
+      locationDescriptor = getDefinitionLocationAndCreateIfUndefined(location)
+      locationDescriptor.describe(cls, loose=loose)
+
+
+class DescriptorClass (ThingClass):
+   """
+   | This is a metaclass for adjective classes.
+   |
+   | If you want to create another metaclass, just subclass this.
+   | If you want to create a Thing class, metaclass this.
+   | If you just want to create an adjective use <js_interpreter.Descriptor> instead
+   """
+
+   def __init__(self, _name, _bases, _dict):
+      super().__init__(_name, _bases, _dict)
+      if not issubclass(self, Descriptor):
+         raise SubclassError("Your new class has to be a subclass of Descriptor {if metaclass=DescriptorClass}")
 
 
 def isThingClassOrDescriptorClass(value: any) -> bool:
-   """Use this if you want to determine the value passed in is
+   """
+   Use this if you want to determine if the value passed in is
    a. the class Thing
    b. the class Descriptor
-   c. a subclass of ThingClass
-   c. a subclass of DescriptorClass"""
+   c. a subclass of ThingClass 
+   d. a subclass of DescriptorClass (already checked because DescriptorClass is a subclass of ThingClass)
+   """
    return (
       (value is Thing) or
       (value is Descriptor) or
-      # TODO: ThingClass
-      (inspect.isclass(value) and issubclass(value, DescriptorClass))
+      (inspect.isclass(value) and issubclass(value, ThingClass))
    )
 
 
@@ -205,6 +276,12 @@ def getDescriptorAndCreateIfUndefined(descriptorText):
       return Descriptor(descriptorText)
    except ValueError:
       return descriptors[descriptorText]
+
+
+def addDefinitionLocationTo(value: Thing, location, loose=False):
+   """Marks where something is defined in the specification."""
+   locationDescriptor = getDefinitionLocationAndCreateIfUndefined(location)
+   locationDescriptor.describe(value, loose=loose)
 
 
 
@@ -241,13 +318,13 @@ class DefinitionLocation (Descriptor, metaclass=DescriptorClass):
       Use <js_interpreter.describeDefinitionLocation> instead
       """
       super().describe(value, loose=loose)
-      value.defined_at = self
 
-
-def describeDefinitionLocation (value: Thing, location: str, loose=False):
-   """Marks where something is defined in the specification."""
-   locationDescriptor = getDefinitionLocationAndCreateIfUndefined(location)
-   locationDescriptor.describe(value, loose=loose)
+      if value.defined_at is None:
+         value.defined_at = self
+      elif isinstance(value.defined_at, DefinitionLocation):
+         value.defined_at = [value.defined_at, self]
+      else:
+         value.defined_at.append(self)
 
 
 def getDefinitionLocationAndCreateIfUndefined (location: str):
@@ -259,63 +336,16 @@ def getDefinitionLocationAndCreateIfUndefined (location: str):
       return specificationLocationDescriptors[location]
 
 
-def createDescriptorWithDefinitionLocation (descriptorText: str, location: str, synonyms=[]):
+def createDescriptorWithDefinitionLocation (descriptorText: str, location: str, **kwargs):
    """Creates a Descriptor described by a Definition Location"""
-   localDescriptor = Descriptor(descriptorText, synonyms=synonyms)
-   describeDefinitionLocation(localDescriptor, location)
+   localDescriptor = Descriptor(descriptorText, **kwargs)
+   localDescriptor.addDefinitionLocation(location)
    return localDescriptor
 
 
-######################################
-#             Definitions            #
-######################################
-
-# Implementation
+# Adding a descriptor to this Implementation itself
 createDescriptorWithDefinitionLocation('implementation (non-conforming)', '4.2: Hosts and Implementations').describe(js_interpreter)
 
-
-# 4.4 Terms and Definitions
-def _createTerm(termName, termDefinition, definedAt, synonyms=[]):
-   """Used for creating terms defined in section 4.4 of the spec"""
-   if ': ' not in definedAt:
-      definedAt += ': ' + termName
-   
-   term = createDescriptorWithDefinitionLocation(termName, definedAt, synonyms=synonyms)
-   term.__doc__ += '\n\n' + termDefinition
-
-
-TermsAndDefinitions = {
-   '4.4.1: implementation-approximated': {
-      "definition": '"defined in whole or in part by an external source but has a recommended, ideal behaviour"'
-   },
-   '4.4.2: implementation-defined': {
-      "definition": '"defined in whole or in part by an external source"'
-   },
-   '4.4.3: host-defined': {
-      "definition": '"same as implementation-defined;"\n' '"Note: Editorially, see clause 4.2"',
-      "synonyms": ['implementation-defined']
-   },
-   '4.4.4: type': {
-      "definition": 
-         '"set of data values as defined in clause 6"\n\n'
-         'Includes the Language...\n'
-         '   Undefined, Null, Boolean, String, Number, BigInt, Object\n'
-         '...and Specification types\n'
-         '   List, Record, Set, Relation, Completion (Record), Reference Record, Property Descriptor, Environment Record, Abstract Closure, Data Block'
-   }
-}
-
-for term, termDictionary in TermsAndDefinitions.items():
-   definedAt, termName = term.split(': ')
-   termDefinition = termDictionary["definition"]
-   synonyms = termDictionary["synonyms"] if "synonyms" in termDictionary else []
-
-   _createTerm(termName, termDefinition, definedAt, synonyms=synonyms)
-
-del definedAt
-del termName
-del termDefinition
-del synonyms
 
 
 ######################################
