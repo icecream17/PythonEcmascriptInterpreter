@@ -17,11 +17,12 @@ from typing import Union, List
 # Importing ...itself?
 import js_interpreter
 from js_interpreter.errors import SubclassError
-from js_interpreter.TypesAndValues import Type
 
 
 CURRENT_IMPLEMENTATION_PROGRESS: typing.Final = '4.4.3: host-defined'
 """This implementation supports clauses 0 thru CURRENT_IMPLEMENTATION_PROGRESS, inclusive"""
+
+LAST_ECMA262_COMMIT: typing.Final = ('416c1ae', 'March 21, 2021')
 
 
 ######################################
@@ -54,10 +55,6 @@ class Thing:
          self.name = name
       if definedAt is not None:
          self.addDefinitionLocation(definedAt)
-
-      if issubclass(self.__class__, Type):
-         self.type = self.__class__
-         self.has = {}
 
    def addDescriptor(self, descriptorName: str):
       try:
@@ -197,7 +194,9 @@ class ThingClass (type, Descriptor):
    | A metaclass for Thing classes.
    |
    | If you want to create another metaclass, just subclass this.
-   | If you want to create a Thing class, metaclass this.
+   | If you want to create a Thing class,
+   | 1. metaclass this
+   | 2. subclass Thing
    | If you just want to create a Thing use <js_interpreter.Thing> instead
    """
 

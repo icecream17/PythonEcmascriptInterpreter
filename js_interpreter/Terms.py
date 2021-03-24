@@ -3,7 +3,6 @@
 import js_interpreter
 from js_interpreter import Thing, ThingClass
 from js_interpreter.errors import SubclassError
-from js_interpreter.TypesAndValues import Type
 
 
 ########################################
@@ -51,7 +50,7 @@ TermsAndDefinitions = {
    },
    '4.4.4 type': {
       'definition': 'set of data values as defined in clause 6',
-      'alreadyDefinedAs': Type,
+      # 'alreadyDefinedAs': Type,
       'not implemented': True
    },
    '4.4.5 primitive value': {
