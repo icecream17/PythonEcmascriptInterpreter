@@ -1,3 +1,8 @@
+# Add parent folder to path so that js_interpreter can be imported
+import sys
+sys.path.append('../')
+
+
 try:
    import js_interpreter
 
