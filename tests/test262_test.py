@@ -147,7 +147,7 @@ def runTest (text, path):
 
    realm = js_interpreter.test262.createRealm(realmMods)
    if negative is not None:
-      if negative.get("phase") == "parse" && negative.get("type") == "ReferenceError":
+      if negative.get("phase") == "parse" and negative.get("type") == "ReferenceError":
          realm.evaluate(hostCode["Do not evaluate"])
 
    for file in filesToEvaluateBeforehand:
@@ -162,7 +162,7 @@ def runTest (text, path):
    if withAddStrict:
       realm = js_interpreter.test262.createRealm(realmMods)
       if negative is not None:
-         if negative.get("phase") == "parse" && negative.get("type") == "ReferenceError":
+         if negative.get("phase") == "parse" and negative.get("type") == "ReferenceError":
             realm.evaluate(hostCode["Do not evaluate"])
 
       for file in filesToEvaluateBeforehand:
