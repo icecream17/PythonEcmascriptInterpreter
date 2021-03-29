@@ -47,7 +47,9 @@ asyncFailPrefix = 'Test262:AsyncTestFailure:'
 asyncWaitTime = 10 # Seconds
 
 hostCode = """
-function $DONOTEVALUATE
+function $DONOTEVALUATE () {
+   throw ReferenceError("Some code was evaluated. Expected not to evaluate this code")
+}
 """
 
 # Functions
@@ -65,7 +67,7 @@ def isDirectory (file):
    return file.content_type == "dir"
 
 def pathSuccess (path):
-   print(f'Success! {path})
+   print(f'Success! {path}')
 
 def getIncludeText (path):
    return getTextOfFile(dirs["harness"].get_content(path))
@@ -105,7 +107,7 @@ def _innerRun (realm, text, isAsync, negative):
       return ("FAIL", error)
    else:
       if negative is not None:
-         return ("FAIL", Exception("Expected code to throw error but instead nothing happened")
+         return ("FAIL", Exception("Expected code to throw error but instead nothing happened"))
       return "PASS"
       
 
@@ -189,5 +191,6 @@ def searchTestDir (testDir):
 
 for testDir in dirs["test"].get_content(""):
    searchTestDir(testDir, "test")
+
 
 
