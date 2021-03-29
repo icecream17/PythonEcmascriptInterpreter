@@ -182,7 +182,7 @@ def searchTestDir (testDir):
    for content in testDir:
       if isDirectory(content):
          searchTestDir(content)
-      elif file.path.endsWith("_FIXTURE.js"):
+      elif content.path.endsWith("_FIXTURE.js"):
          continue
       else:
          runTestFile(content)
