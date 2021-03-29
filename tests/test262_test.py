@@ -1,8 +1,9 @@
 import sys
-print('Not done yet!')
-sys.exit(0)
+import pytest
+pytest.exit(0, 'Not done yet!')
 
-
+# Add parent folder to path so that js_interpreter can be imported
+sys.path.append('../')
 
 import js_interpreter
 import js_interpreter.test262
@@ -10,12 +11,10 @@ import js_interpreter.test262
 
 # If not finished, exit
 if not js_interpreter.finished:
-   print("not js_interpreter.finished")
-   sys.exit(0)
+   pytest.exit("not js_interpreter.finished")
 
 if not js_interpreter.test262.finished:
-   print("not js_interpreter.test262.finished")
-   sys.exit(0)
+   pytest.exit("not js_interpreter.test262.finished")
 
 # Otherwise...
 # Github
