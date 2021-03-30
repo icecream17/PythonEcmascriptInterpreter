@@ -41,7 +41,7 @@ assert hasattr(js_interpreter, "CURRENT_IMPLEMENTATION_PROGRESS")
 assert isStringOrContainer(js_interpreter.CURRENT_IMPLEMENTATION_PROGRESS)
 
 # 5
-assert hasattr(js_interpreter, "LATEST_ECMA262_COMMIT")
+assert hasattr(js_interpreter, "CURRENT_ECMA262_COMMIT")
 
 # 6
-assert isStringOrContainer(js_interpreter.LATEST_ECMA262_COMMIT)
+assert isStringOrContainer(js_interpreter.CURRENT_ECMA262_COMMIT)
