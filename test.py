@@ -31,10 +31,10 @@ assert hasattr(js_interpreter, "CURRENT_IMPLEMENTATION_PROGRESS")
 
 # 3
 assert not (
-   isinstance(js_interpreter["CURRENT_IMPLEMENTATION_PROCESS"], type(None)) or
-   isinstance(js_interpreter["CURRENT_IMPLEMENTATION_PROCESS"], bool) or
-   isinstance(js_interpreter["CURRENT_IMPLEMENTATION_PROCESS"], float) or
-   isinstance(js_interpreter["CURRENT_IMPLEMENTATION_PROCESS"], int)
+   isinstance(js_interpreter.CURRENT_IMPLEMENTATION_PROCESS, type(None)) or
+   isinstance(js_interpreter.CURRENT_IMPLEMENTATION_PROCESS, bool) or
+   isinstance(js_interpreter.CURRENT_IMPLEMENTATION_PROCESS, float) or
+   isinstance(js_interpreter.CURRENT_IMPLEMENTATION_PROCESS, int)
 )
 
 # 4
@@ -42,8 +42,8 @@ assert hasattr(js_interpreter, "LATEST_ECMA262_COMMIT")
 
 # 5
 assert not (
-   isinstance(js_interpreter["CURRENT_IMPLEMENTATION_PROCESS"], type(None)) or
-   isinstance(js_interpreter["CURRENT_IMPLEMENTATION_PROCESS"], bool) or
-   isinstance(js_interpreter["CURRENT_IMPLEMENTATION_PROCESS"], float) or
-   isinstance(js_interpreter["CURRENT_IMPLEMENTATION_PROCESS"], int)
+   isinstance(js_interpreter.LATEST_ECMA262_COMMIT, type(None)) or
+   isinstance(js_interpreter.LATEST_ECMA262_COMMIT, bool) or
+   isinstance(js_interpreter.LATEST_ECMA262_COMMIT, float) or
+   isinstance(js_interpreter.LATEST_ECMA262_COMMIT, int)
 )
