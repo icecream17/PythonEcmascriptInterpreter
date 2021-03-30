@@ -22,28 +22,26 @@ myOwnTest262.run_tests(
 # 0
 assert True, "This test file has valid syntax!"
 
+
 # 1
+def isStringOrContainer(value):
+   return isinstance(value, (str, list, tuple, range, dict, set, frozenset))
+
+
+assert True, "Test initialization didn't crash!"
+
+# 2
 import js_interpreter
 assert True, "Importing doesn't crash!"
 
-# 2
+# 3
 assert hasattr(js_interpreter, "CURRENT_IMPLEMENTATION_PROGRESS")
 
-# 3
-assert not (
-   isinstance(js_interpreter.CURRENT_IMPLEMENTATION_PROCESS, type(None)) or
-   isinstance(js_interpreter.CURRENT_IMPLEMENTATION_PROCESS, bool) or
-   isinstance(js_interpreter.CURRENT_IMPLEMENTATION_PROCESS, float) or
-   isinstance(js_interpreter.CURRENT_IMPLEMENTATION_PROCESS, int)
-)
-
 # 4
-assert hasattr(js_interpreter, "LATEST_ECMA262_COMMIT")
+assert isStringOrContainer(js_interpreter.CURRENT_IMPLEMENTATION_PROGRESS)
 
 # 5
-assert not (
-   isinstance(js_interpreter.LATEST_ECMA262_COMMIT, type(None)) or
-   isinstance(js_interpreter.LATEST_ECMA262_COMMIT, bool) or
-   isinstance(js_interpreter.LATEST_ECMA262_COMMIT, float) or
-   isinstance(js_interpreter.LATEST_ECMA262_COMMIT, int)
-)
+assert hasattr(js_interpreter, "LATEST_ECMA262_COMMIT")
+
+# 6
+assert isStringOrContainer(js_interpreter.LATEST_ECMA262_COMMIT)
