@@ -1,7 +1,11 @@
-import unicodedata
-import requests
+"""
+Provides unicode support because JavaScript code is encoded with Unicode.
+"""
+
 from datetime import datetime
 from email.utils import parsedate
+import unicodedata
+import requests
 
 
 ######################################
@@ -10,10 +14,12 @@ from email.utils import parsedate
 
 # Thanks to https://stackoverflow.com/questions/1471987/how-do-i-parse-an-http-date-string-in-python
 def _datetimeFromHTTPheader(httpDatetime):
+   if httpDatetime is None:
+      return None
    return datetime(*parsedate(httpDatetime)[:6])
 
 
-def getPropertyListData():
+def getUnicodePropertyListData():
    def _removeComments(line):
       index = line.find('#')
       if index == -1:
@@ -67,9 +73,9 @@ def updatePropertyListData():
    global PropertyListDataLastModified
    global PropertyListData
    latestPropertyListDataRequest = requests.get("https://www.unicode.org/Public/14.0.0/ucd/PropList-14.0.0d9.txt")
-   latestPropertyListDataRequestTime = _datetimeFromHTTPheader(latestPropertyListDataRequest.headers['Date'])
-   PropertyListDataLastModified = _datetimeFromHTTPheader(latestPropertyListDataRequest.headers['Last-Modified'])
-   PropertyListData = getPropertyListData()
+   latestPropertyListDataRequestTime = _datetimeFromHTTPheader(latestPropertyListDataRequest.headers.get('Date', None))
+   PropertyListDataLastModified = _datetimeFromHTTPheader(latestPropertyListDataRequest.headers.get('Last-Modified', None))
+   PropertyListData = getUnicodePropertyListData()
 
 
 latestPropertyListDataRequest = None
@@ -81,6 +87,15 @@ updatePropertyListData()
 
 ######################################
 #       Handy Unicode Functions      #
+######################################
+
+def codePointsOfString (string):
+   return [ord(character) for character in string]
+
+
+
+######################################
+#     Unicode Category Functions     #
 ######################################
 
 
@@ -136,7 +151,7 @@ def HasPropertyID_Continue(char):
    huge_condition = (
       HasPropertyID_Start(char) or
       IsInCategoryNonspacingMark(char) or
-      IsInCategorySpacingMark(char) or 
+      IsInCategorySpacingMark(char) or
       IsInCategoryDecimalNumber(char) or
       IsInCategoryConnectorPunctuation(char) or
       HasProperty("Other_ID_Continue", char)
