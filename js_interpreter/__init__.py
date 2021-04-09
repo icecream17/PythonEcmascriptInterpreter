@@ -12,4 +12,4 @@ CURRENT_IMPLEMENTATION_PROGRESS: typing.Final = '0: Introduction'
 """This implementation supports clauses 0 thru CURRENT_IMPLEMENTATION_PROGRESS, inclusive"""
 
 LAST_ECMA262_COMMIT: typing.Final = _utils.Commit(
-   0xa12b4d4420adddb660ecd3e81f3ef737b1b100d8, datetime.date(2021, 4, 1))
+   0x26061c0e5e4b62fae91a7127b46c1efa8b94c4b4, datetime.date(2021, 4, 9))
