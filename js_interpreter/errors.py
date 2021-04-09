@@ -11,8 +11,8 @@ Just like the _utils file, except here there's just errors.
 #    """When a type can only create a limited number of values"""
 
 
-# class RangeError (ValueError):
-#    """Equivalent to the Javascript RangeError"""
+class RangeError (ValueError):
+   """Equivalent to the Javascript RangeError"""
 
 
 # class AttributeTypeError (AttributeError, TypeError):

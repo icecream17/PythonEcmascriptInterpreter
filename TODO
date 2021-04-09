@@ -1,0 +1,28 @@
+
+General
+- [ ] Testing
+   - [ ] Use test262
+- [ ] Interpreter interals
+- [ ] Interpreter externals
+- [ ] Create documentation
+
+
+Interpreter internals
+- [ ] _storage
+- [ ] _unicode should use _storage
+- [ ] Figure out and document structure
+
+
+Interpreter externals
+- [ ] terms and definitions
+   - [ ] internal descriptors
+   - [ ] type
+   - [ ] value
+- [ ] notational conventions
+   - [ ] grammar
+      - [ ] language
+      - [ ] production
+      - [ ] terminal / non-terminal
+      - [ ] goal symbol
+      - [ ] different grammar types
+   - [ ] algorithm
