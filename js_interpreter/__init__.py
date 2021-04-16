@@ -5,7 +5,8 @@ An implementation of JS in python, for educational purposes
 import datetime
 import typing
 
-import js_interpreter._utils as _utils
+# js_interpreter imports
+import _utils
 
 
 CURRENT_IMPLEMENTATION_PROGRESS: typing.Final = '0: Introduction'
