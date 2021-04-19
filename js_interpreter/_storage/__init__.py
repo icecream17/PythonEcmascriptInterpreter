@@ -45,7 +45,7 @@ def createGlobalStoragePath(filename):
 Use `open` to open a file,
 and `os.remove` to delete a file
 """
-storedItemPaths = Set()
+storedItemPaths = set()
 
 
 def makeUniquePath(dir, is_global=False):
@@ -90,14 +90,14 @@ class StoredItem:
       fromData  - takes the data from toData and converts it back into the object
       """
       assert os.path.isdir(dir), "dir argument must be a directory"
-      assert iscallable(toData), "toData argument must be callable"
-      assert iscallable(fromData), "fromData argument must be callable"
+      assert callable(toData), "toData argument must be callable"
+      assert callable(fromData), "fromData argument must be callable"
       self.object = obj
       self.toData = toData
       self.fromData = fromData
       self.isStored = False
 
-      self._path = _makeUniquePath(dir, is_global=is_global)
+      self._path = makeUniquePath(dir, is_global=is_global)
 
    @property
    def path(self):
