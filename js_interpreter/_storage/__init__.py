@@ -117,7 +117,7 @@ class StoredItem:
       # Create file
       open(self.path, 'a+').close()
 
-      with storageFile as open(self.path, 'w+'):
+      with open(self.path, 'w+') as storageFile:
          storageFile.write(self.toData(self.object))
 
       del self.object
@@ -131,7 +131,7 @@ class StoredItem:
       if not os.path.exists(self.path):
          raise ValueError("This item is stored but the storage file doesn't exsist!!!!")
 
-      with storageFile as open(self.path, 'r'):
+      with open(self.path, 'r') as storageFile:
          self.object = self.fromData(storageFile.read())
 
       self.deleteFile()
